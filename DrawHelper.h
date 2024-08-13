@@ -1359,9 +1359,9 @@ void drawKeypad()
     tft.setTextColor(TFT_WHITE, TFT_BLACK);
 
     tft.printf("  %s failed to load and might be corrupted.\n", jsonfilefail);
-    tft.println("  You can reset that specific file to default by opening the serial monitor");
-    tft.printf("  and typing \"reset %s\"\n", jsonfilefail);
-    tft.println("  If you don't do this, the configurator will fail to load.");
+    tft.println("  You can reset that specific file to default by\n  opening the serial monitor and typing");
+    tft.printf("  \"reset %s\"\n", jsonfilefail);
+    tft.println("  If you don't do this, the configurator will fail\n  to load.");
   }
   else
   {
