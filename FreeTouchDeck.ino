@@ -26,6 +26,8 @@
       - Dustin Watts FT6236 Library (version 1.0.2), https://github.com/DustinWatts/FT6236
       -or-
       A new library that I created that has some more support for different FocalTech touch IC's.
+      -or- (ESP32 2432S028C / JC2432W328 (CST820) CYD "variant")
+      Brian Lough's bb_captouch Library (version 1.2.0), https://github.com/bitbank2/bb_captouch
       
   The FILESYSTEM (SPI FLASH filing system) is used to hold touch screen calibration data.
   It has to be runs at least once when using resistive touch. After that you can set 
@@ -42,7 +44,7 @@
 
 // ------- Uncomment the next line if you use capacitive touch -------
 // (The ESP32 TOUCHDOWN and the ESP32 TouchDown S3 uses this!)
-//#define USECAPTOUCH
+#define USECAPTOUCH
 
 //#define ESP32TouchDownS3
 
@@ -56,7 +58,7 @@
 
 // ------- Uncomment the define below if you want to use SLEEP and wake up on touch -------
 // The pin where the IRQ from the touch screen is connected uses ESP-style GPIO_NUM_* instead of just pinnumber
-#define touchInterruptPin GPIO_NUM_27
+#define touchInterruptPin GPIO_NUM_36
 
 // ------- Uncomment the define below if you want to use a piezo buzzer and specify the pin where the speaker is connected -------
 //#define speakerPin 26
@@ -141,8 +143,15 @@ const char *versionnumber = "0.9.18a";
 
 #ifdef USECAPTOUCH
   #include <Wire.h>
-  #include <FT6236.h>
-  FT6236 ts = FT6236();
+  //#include <FT6236.h>
+  //FT6236 ts = FT6236();
+  #include <bb_captouch.h>
+  BBCapTouch bbct;
+
+  #define TOUCH_SDA  33
+  #define TOUCH_SCL  32
+  #define TOUCH_INT 21
+  #define TOUCH_RST 25
 #endif // defined(USECAPTOUCH)
 
 AsyncWebServer webserver(80);
@@ -162,8 +171,8 @@ Preferences savedStates;
 #define REPEAT_CAL false
 
 // Set the width and height of your screen here:
-#define SCREEN_WIDTH 480
-#define SCREEN_HEIGHT 320
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
 
 // Keypad start position, centre of the first button
 #define KEY_X SCREEN_WIDTH / 6
@@ -348,19 +357,24 @@ void setup()
   Serial.println("");
 
 #ifdef USECAPTOUCH
-  #ifdef CUSTOM_TOUCH_SDA
-    if (!ts.begin(40, CUSTOM_TOUCH_SDA, CUSTOM_TOUCH_SCL))
-  #else
-    if (!ts.begin(40))
-  #endif // defined(CUSTOM_TOUCH_SDA)
-  {
-    Serial.println("[WARNING]: Unable to start the capacitive touchscreen.");
-  }
-  else
-  {
-    Serial.println("[INFO]: Capacitive touch started!");
-  }
+  bbct.init(TOUCH_SDA, TOUCH_SCL, TOUCH_RST, TOUCH_INT);
+  bbct.setOrientation(270, SCREEN_HEIGHT, SCREEN_WIDTH);
+  Serial.println("[INFO]: Capacitive touch started! (CST820)");
 #endif // defined(USECAPTOUCH)
+
+  // --------------- Init Display -------------------------
+
+  // Initialise the TFT screen
+  tft.init();
+
+  // Set the rotation before we calibrate
+  tft.setRotation(3);
+
+  // Clear the screen
+  tft.fillScreen(TFT_BLACK);
+
+  esp_sleep_wakeup_cause_t wakeup_reason;
+  wakeup_reason = esp_sleep_get_wakeup_cause();
 
   // Setup PWM channel and attach pin bl_pin
   ledcSetup(0, 5000, 8);
@@ -371,20 +385,13 @@ void setup()
 #endif // defined(TFT_BL)
   ledcWrite(0, ledBrightness); // Start @ initial Brightness
 
-  // --------------- Init Display -------------------------
-
-  // Initialise the TFT screen
-  tft.init();
-
-  // Set the rotation before we calibrate
-  tft.setRotation(1);
-
-  // Clear the screen
-  tft.fillScreen(TFT_BLACK);
-
-  esp_sleep_wakeup_cause_t wakeup_reason;
-  wakeup_reason = esp_sleep_get_wakeup_cause();
-
+  //Turn LED Off
+  pinMode(4, OUTPUT);
+  pinMode(16, OUTPUT);
+  pinMode(17, OUTPUT);
+  digitalWrite(4, HIGH);
+  digitalWrite(16, HIGH);
+  digitalWrite(17, HIGH);
 
   // -------------- Start filesystem ----------------------
 
@@ -743,18 +750,16 @@ void loop(void)
     // If pageNum = 7, we are in STA or AP mode.
     // We no check if the button is pressed, and if so restart.
 #ifdef USECAPTOUCH
-    if (ts.touched())
+    TOUCHINFO ti;
+    if (bbct.getSamples(&ti))
     {
+      if (ti.count > 0) 
+      {
+        t_x = ti.x[0];
+        t_y = ti.y[0];
 
-      // Retrieve a point
-      TS_Point p = ts.getPoint();
-
-      //Flip things around so it matches our screen rotation
-      p.x = map(p.x, 0, 320, 320, 0);
-      t_y = p.x;
-      t_x = p.y;
-
-      pressed = true;
+        pressed = true;
+      }
     }
 
 #else
@@ -792,18 +797,16 @@ void loop(void)
     boolean pressed = false;
 
 #ifdef USECAPTOUCH
-    if (ts.touched())
+    TOUCHINFO ti;
+    if (bbct.getSamples(&ti))
     {
+      if (ti.count > 0) 
+      {
+        t_x = ti.x[0];
+        t_y = ti.y[0];
 
-      // Retrieve a point
-      TS_Point p = ts.getPoint();
-
-      //Flip things around so it matches our screen rotation
-      p.x = map(p.x, 0, 320, 320, 0);
-      t_y = p.x;
-      t_x = p.y;
-
-      pressed = true;
+        pressed = true;
+      }
     }
 
 #else
@@ -830,18 +833,16 @@ void loop(void)
     boolean pressed = false;
 
 #ifdef USECAPTOUCH
-    if (ts.touched())
+    TOUCHINFO ti;
+    if (bbct.getSamples(&ti))
     {
+      if (ti.count > 0) 
+      {
+        t_x = ti.x[0];
+        t_y = ti.y[0];
 
-      // Retrieve a point
-      TS_Point p = ts.getPoint();
-
-      //Flip things around so it matches our screen rotation
-      p.x = map(p.x, 0, 320, 320, 0);
-      t_y = p.x;
-      t_x = p.y;
-
-      pressed = true;
+        pressed = true;
+      }
     }
 
 #else
@@ -869,18 +870,16 @@ void loop(void)
     boolean pressed = false;
 
 #ifdef USECAPTOUCH
-    if (ts.touched())
+    TOUCHINFO ti;
+    if (bbct.getSamples(&ti))
     {
+      if (ti.count > 0) 
+      {
+        t_x = ti.x[0];
+        t_y = ti.y[0];
 
-      // Retrieve a point
-      TS_Point p = ts.getPoint();
-
-      //Flip things around so it matches our screen rotation
-      p.x = map(p.x, 0, 320, 320, 0);
-      t_y = p.x;
-      t_x = p.y;
-
-      pressed = true;
+        pressed = true;
+      }
     }
 
 #else
@@ -957,18 +956,16 @@ void loop(void)
     boolean pressed = false;
 
 #ifdef USECAPTOUCH
-    if (ts.touched())
+    TOUCHINFO ti;
+    if (bbct.getSamples(&ti))
     {
+      if (ti.count > 0) 
+      {
+        t_x = ti.x[0];
+        t_y = ti.y[0];
 
-      // Retrieve a point
-      TS_Point p = ts.getPoint();
-
-      //Flip things around so it matches our screen rotation
-      p.x = map(p.x, 0, 320, 320, 0);
-      t_y = p.x;
-      t_x = p.y;
-
-      pressed = true;
+        pressed = true;
+      }
     }
 
 #else
