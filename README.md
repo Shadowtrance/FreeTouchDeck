@@ -7,6 +7,8 @@
 [![](https://badgen.net/badge/watch/on%20youtube/ff0000)](https://www.youtube.com/watch?v=s2X4BQ9VmEU)
 [![](https://img.shields.io/twitter/follow/DustinWattsNL)](https://twitter.com/DustinWattsNL)
 
+**This fork/branch is specifically for the CYD (Cheap Yellow Display) "variant...i guess" ESP322432S028C (JC2432W328) with USB-C and Capacitive touch (CST820 touch sensor)** https://www.aliexpress.com/item/1005006948064622.html
+
 For interfacing with Windows/macOS/Linux using an ESP32, a touchscreen, and BLE.
 
 ## Install Using The Web Installer (recommended!)
