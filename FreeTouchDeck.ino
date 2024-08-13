@@ -772,8 +772,8 @@ void loop(void)
     {     
       // If pressed check if the touch falls within the restart button
       // drawSingleButton(140, 180, 200, 80, generalconfig.menuButtonColour, TFT_WHITE, "Restart");
-      if (t_x > 140 && t_x < 340){
-        if (t_y > 180 && t_y < 260){
+      if (t_x > 140 && t_x < 320){
+        if (t_y > 180 && t_y < 240){
           // Touch falls within the boundaries of our button so we restart
           Serial.println("[WARNING]: Restarting");
           ESP.restart();

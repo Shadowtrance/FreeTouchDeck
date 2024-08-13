@@ -147,12 +147,12 @@ void configmode()
     tft.println("WiFi Config still set to default! Starting as AP.");
     Serial.println("[WARNING]: WiFi Config still set to default! Configurator started as AP.");
     startDefaultAP();
-    tft.println("Started as AP because WiFi settings are still set to default.");
-    tft.println("To configure, connect to 'FreeTouchDeck' with password 'defaultpass'");
+    tft.println("Started as AP because WiFi settings are still set\nto default.");
+    tft.println("To configure, connect to 'FreeTouchDeck' with\npassword 'defaultpass'");
     tft.println("Then go to http://freetouchdeck.local");
     tft.print("The IP is: ");
     tft.println(WiFi.softAPIP());
-    drawSingleButton(140, 180, 200, 80, generalconfig.menuButtonColour, TFT_WHITE, "Restart");
+    drawSingleButton(140, 180, 180, 60, generalconfig.menuButtonColour, TFT_WHITE, "Restart");
     return;
   }
 
@@ -162,11 +162,11 @@ void configmode()
     Serial.println("[WARNING]: WiFi Config Failed to load! Configurator started as AP.");
     startDefaultAP();
     tft.println("Started as AP because WiFi settings failed to load.");
-    tft.println("To configure, connect to 'FreeTouchDeck' with password 'defaultpass'");
+    tft.println("To configure, connect to 'FreeTouchDeck' with\npassword 'defaultpass'");
     tft.println("Then go to http://freetouchdeck.local");
     tft.print("The IP is: ");
     tft.println(WiFi.softAPIP());
-    drawSingleButton(140, 180, 200, 80, generalconfig.menuButtonColour, TFT_WHITE, "Restart");
+    drawSingleButton(140, 180, 180, 60, generalconfig.menuButtonColour, TFT_WHITE, "Restart");
     return;
   }
 
@@ -176,11 +176,11 @@ void configmode()
       startDefaultAP();
       Serial.println("[WARNING]: Could not connect to AP, so started as AP.");
       tft.println("Started as AP because WiFi connection failed.");
-      tft.println("To configure, connect to 'FreeTouchDeck' with password 'defaultpass'");
+      tft.println("To configure, connect to 'FreeTouchDeck' with\npassword 'defaultpass'");
       tft.println("Then go to http://freetouchdeck.local");
       tft.print("The IP is: ");
       tft.println(WiFi.softAPIP());
-      drawSingleButton(140, 180, 200, 80, generalconfig.menuButtonColour, TFT_WHITE, "Restart");
+      drawSingleButton(140, 180, 180, 60, generalconfig.menuButtonColour, TFT_WHITE, "Restart");
     }
     else
     {
@@ -189,7 +189,7 @@ void configmode()
       tft.println("http://freetouchdeck.local");
       tft.print("The IP is: ");
       tft.println(WiFi.localIP());
-      drawSingleButton(140, 180, 200, 80, generalconfig.menuButtonColour, TFT_WHITE, "Restart");
+      drawSingleButton(140, 180, 180, 60, generalconfig.menuButtonColour, TFT_WHITE, "Restart");
     }
 
   }
@@ -201,7 +201,7 @@ void configmode()
     tft.println("http://freetouchdeck.local");
     tft.print("The IP is: ");
     tft.println(WiFi.softAPIP());
-    drawSingleButton(140, 180, 200, 80, generalconfig.menuButtonColour, TFT_WHITE, "Restart");
+    drawSingleButton(140, 180, 180, 60, generalconfig.menuButtonColour, TFT_WHITE, "Restart");
   }
 }
 
